@@ -15,14 +15,16 @@ const navItems = [
   { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/tontines", label: "Mes tontines", icon: Users },
   { href: "/wallet", label: "Portefeuille", icon: Wallet },
+  { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/settings", label: "Paramètres", icon: Settings },
 ];
 
 interface TopBarProps {
   user: Session["user"];
+  unreadCount?: number;
 }
 
-export function TopBar({ user }: TopBarProps) {
+export function TopBar({ user, unreadCount = 0 }: TopBarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -58,8 +60,9 @@ export function TopBar({ user }: TopBarProps) {
             className="relative p-2 rounded-lg hover:bg-(--muted) text-(--muted-foreground) transition-colors"
           >
             <Bell size={20} />
-            {/* Badge non-lu (TODO: dynamic) */}
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            )}
           </Link>
 
           {/* Avatar (mobile) */}

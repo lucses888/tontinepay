@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -8,66 +9,56 @@ import {
   Wallet,
   AlertCircle,
   Plus,
-  Loader2,
+  MapPin,
+  Settings,
 } from "lucide-react";
+
+// Types de transactions qui créditent le portefeuille de l'utilisateur
+const CREDIT_TYPES = ["DISBURSEMENT", "REFUND", "GUARANTEE_OUT"];
+
+const TYPE_LABELS: Record<string, string> = {
+  CONTRIBUTION: "Cotisation",
+  DISBURSEMENT: "Versement reçu",
+  PENALTY: "Pénalité",
+  COMMISSION: "Commission",
+  GUARANTEE_IN: "Dépôt de caution",
+  GUARANTEE_OUT: "Remboursement de caution",
+  REFUND: "Remboursement",
+};
 
 export default async function WalletPage() {
   const session = await auth();
-  if (!session?.user?.id) return null;
+  if (!session?.user?.id) redirect("/login");
 
   const userId = session.user.id;
 
-  // Données parallèles
-  const [user, transactions, pendingContributions, activeTontines] =
-    await Promise.all([
-      prisma.user.findUnique({
-        where: { id: userId },
-        select: { name: true, email: true, totalSaved: true, reliabilityScore: true },
-      }),
-      prisma.transaction.findMany({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-      }),
-      prisma.contribution.count({
-        where: { userId, status: "PENDING" },
-      }),
-      prisma.tontine.findMany({
-        where: {
-          members: { some: { userId, status: { not: "EXCLUDED" } } },
-          status: "ACTIVE",
-        },
-        select: {
-          id: true,
-          name: true,
-          amount: true,
-          cycles: {
-            where: { status: "ACTIVE" },
-            take: 1,
-            select: {
-              collectedAmount: true,
-              totalAmount: true,
-            },
-          },
-        },
-      }),
-    ]);
+  const [user, transactions, pendingCount, upcomingPayouts] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { totalSaved: true, reliabilityScore: true },
+    }),
+    prisma.transaction.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    }),
+    prisma.contribution.count({
+      where: { userId, status: "PENDING" },
+    }),
+    // Cycles à venir dont l'utilisateur est le bénéficiaire
+    prisma.cycle.findMany({
+      where: {
+        beneficiaryId: userId,
+        status: { in: ["ACTIVE", "UPCOMING"] },
+        tontine: { status: "ACTIVE" },
+      },
+      select: { totalAmount: true },
+    }),
+  ]);
 
   const totalSaved = user?.totalSaved ?? 0;
-  const pendingCount = pendingContributions;
-
-  // Calculer le total à recevoir (sommes des cycles actifs où l'utilisateur devrait recevoir)
-  let totalToReceive = 0;
-  activeTontines.forEach(tontine => {
-    const activeCycle = tontine.cycles[0];
-    if (activeCycle) {
-      const progress = activeCycle.collectedAmount / activeCycle.totalAmount;
-      // Si la collecte est complète, l'utilisateur devrait recevoir bientôt
-      if (progress >= 0.95) { // 95% collecté
-        totalToReceive += tontine.amount;
-      }
-    }
-  });
+  const totalToReceive = upcomingPayouts.reduce((sum, c) => sum + c.totalAmount, 0);
+  const reliability = Math.round(user?.reliabilityScore ?? 100);
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -86,12 +77,12 @@ export default async function WalletPage() {
       {/* Cartes de résumé */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-(--card) rounded-xl border border-(--border) p-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 gap-2">
             <div>
               <Wallet size={20} className="text-green-600 mb-2" />
               <h3 className="font-semibold">Total épargné</h3>
             </div>
-            <span className="text-2xl font-bold text-green-600">{formatCurrency(totalSaved)}</span>
+            <span className="text-xl font-bold text-green-600">{formatCurrency(totalSaved)}</span>
           </div>
           <p className="text-(--muted-foreground) text-sm">
             Épargne accumulée dans toutes vos tontines
@@ -99,25 +90,25 @@ export default async function WalletPage() {
         </div>
 
         <div className="bg-(--card) rounded-xl border border-(--border) p-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 gap-2">
             <div>
               <TrendingUp size={20} className="text-amber-600 mb-2" />
-              <h3 className="font-semibold">À recevoir bientôt</h3>
+              <h3 className="font-semibold">À recevoir</h3>
             </div>
-            <span className="text-2xl font-bold text-amber-600">{formatCurrency(totalToReceive)}</span>
+            <span className="text-xl font-bold text-amber-600">{formatCurrency(totalToReceive)}</span>
           </div>
           <p className="text-(--muted-foreground) text-sm">
-            Montant attendu dans les prochains cycles
+            Montant attendu lors de vos prochains tours
           </p>
         </div>
 
         <div className="bg-(--card) rounded-xl border border-(--border) p-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 gap-2">
             <div>
               <AlertCircle size={20} className="text-red-600 mb-2" />
               <h3 className="font-semibold">Cotisations en attente</h3>
             </div>
-            <span className="text-2xl font-bold text-red-600">{pendingCount}</span>
+            <span className="text-xl font-bold text-red-600">{pendingCount}</span>
           </div>
           <p className="text-(--muted-foreground) text-sm">
             Cotisations à payer pour éviter les pénalités
@@ -125,14 +116,12 @@ export default async function WalletPage() {
         </div>
 
         <div className="bg-(--card) rounded-xl border border-(--border) p-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 gap-2">
             <div>
               <ArrowRight size={20} className="text-blue-600 mb-2" />
               <h3 className="font-semibold">Score fiabilité</h3>
             </div>
-            <span className="text-2xl font-bold text-blue-600">
-              {user?.reliabilityScore ?? 100}%
-            </span>
+            <span className="text-xl font-bold text-blue-600">{reliability}%</span>
           </div>
           <p className="text-(--muted-foreground) text-sm">
             Indicateur de votre ponctualité dans les paiements
@@ -145,36 +134,34 @@ export default async function WalletPage() {
         <h2 className="text-xl font-semibold mb-4">Historique des transactions</h2>
 
         {transactions.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-(--muted-foreground)">Aucune transaction trouvée</p>
+          <div className="bg-(--card) rounded-xl border border-(--border) text-center py-8">
+            <p className="text-(--muted-foreground)">Aucune transaction pour le moment</p>
           </div>
         ) : (
           <div className="bg-(--card) rounded-xl border border-(--border) divide-y divide-(--border)">
-            {transactions.map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between p-4">
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{tx.description ?? tx.type}</p>
-                  <p className="text-xs text-(--muted-foreground)">
-                    {formatDate(tx.createdAt)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
+            {transactions.map((tx) => {
+              const isCredit = CREDIT_TYPES.includes(tx.type);
+              return (
+                <div key={tx.id} className="flex items-center justify-between gap-3 p-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {tx.description ?? TYPE_LABELS[tx.type] ?? tx.type}
+                    </p>
+                    <p className="text-xs text-(--muted-foreground)">
+                      {TYPE_LABELS[tx.type] ?? tx.type} · {formatDate(tx.createdAt)}
+                    </p>
+                  </div>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                      tx.type === "DISBURSEMENT"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-red-100 text-red-600"
+                    className={`font-semibold whitespace-nowrap ${
+                      isCredit ? "text-green-600" : "text-red-600"
                     }`}
                   >
-                    {tx.type === "DISBURSEMENT" ? "+" : "-"}
-                  </span>
-                  <span className="font-semibold text-lg">
-                    {tx.type === "DISBURSEMENT" ? "+" : "-"}
+                    {isCredit ? "+" : "-"}
                     {formatCurrency(tx.amount)}
                   </span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
@@ -190,7 +177,7 @@ export default async function WalletPage() {
             <Plus size={24} className="mb-3 text-green-600" />
             <h3 className="font-semibold mb-2">Créer une tontine</h3>
             <p className="text-(--muted-foreground) text-sm">
-              Démarrez votre propre groupe d'épargne
+              Démarrez votre propre groupe d&apos;épargne
             </p>
           </Link>
 
@@ -201,7 +188,7 @@ export default async function WalletPage() {
             <MapPin size={24} className="mb-3 text-blue-600" />
             <h3 className="font-semibold mb-2">Rejoindre une tontine</h3>
             <p className="text-(--muted-foreground) text-sm">
-              Participerez à un groupe existant avec un code d'invitation
+              Participez à un groupe existant avec un code d&apos;invitation
             </p>
           </Link>
 
@@ -220,6 +207,3 @@ export default async function WalletPage() {
     </div>
   );
 }
-
-// Import MapPin and Settings at the top
-import { MapPin, Settings } from "lucide-react";
