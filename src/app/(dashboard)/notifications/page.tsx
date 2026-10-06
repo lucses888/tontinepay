@@ -98,7 +98,7 @@ export default async function NotificationsPage() {
               <div
                 key={n.id}
                 className={`flex items-start gap-4 p-5 transition hover:bg-(--muted) ${
-                  n.isRead ? "" : "bg-green-50/60"
+                  n.isRead ? "" : "bg-green-500/10"
                 }`}
               >
                 <div className="shrink-0 mt-1">

@@ -11,6 +11,7 @@ import {
   Plus,
   MapPin,
   Settings,
+  type LucideIcon,
 } from "lucide-react";
 
 // Types de transactions qui créditent le portefeuille de l'utilisateur
@@ -25,6 +26,35 @@ const TYPE_LABELS: Record<string, string> = {
   GUARANTEE_OUT: "Remboursement de caution",
   REFUND: "Remboursement",
 };
+
+function SummaryCard({
+  icon: Icon,
+  iconClass,
+  valueClass,
+  title,
+  value,
+  description,
+}: {
+  icon: LucideIcon;
+  iconClass: string;
+  valueClass: string;
+  title: string;
+  value: string;
+  description: string;
+}) {
+  return (
+    <div className="min-w-0 bg-(--card) rounded-xl border border-(--border) p-4">
+      <div className="flex items-center gap-2 mb-2">
+        <Icon size={18} className={`shrink-0 ${iconClass}`} />
+        <h3 className="text-sm font-semibold leading-tight">{title}</h3>
+      </div>
+      <p className={`text-lg sm:text-xl lg:text-2xl font-bold break-words ${valueClass}`}>
+        {value}
+      </p>
+      <p className="mt-1 text-xs sm:text-sm text-(--muted-foreground)">{description}</p>
+    </div>
+  );
+}
 
 export default async function WalletPage() {
   const session = await auth();
@@ -61,10 +91,10 @@ export default async function WalletPage() {
   const reliability = Math.round(user?.reliabilityScore ?? 100);
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-6 max-w-6xl w-full min-w-0">
       {/* En-tête */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Mon Portefeuille</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl sm:text-3xl font-bold">Mon Portefeuille</h1>
         <Link
           href="/tontines/new"
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition"
@@ -75,63 +105,44 @@ export default async function WalletPage() {
       </div>
 
       {/* Cartes de résumé */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-(--card) rounded-xl border border-(--border) p-4">
-          <div className="flex items-center justify-between mb-3 gap-2">
-            <div>
-              <Wallet size={20} className="text-green-600 mb-2" />
-              <h3 className="font-semibold">Total épargné</h3>
-            </div>
-            <span className="text-xl font-bold text-green-600">{formatCurrency(totalSaved)}</span>
-          </div>
-          <p className="text-(--muted-foreground) text-sm">
-            Épargne accumulée dans toutes vos tontines
-          </p>
-        </div>
-
-        <div className="bg-(--card) rounded-xl border border-(--border) p-4">
-          <div className="flex items-center justify-between mb-3 gap-2">
-            <div>
-              <TrendingUp size={20} className="text-amber-600 mb-2" />
-              <h3 className="font-semibold">À recevoir</h3>
-            </div>
-            <span className="text-xl font-bold text-amber-600">{formatCurrency(totalToReceive)}</span>
-          </div>
-          <p className="text-(--muted-foreground) text-sm">
-            Montant attendu lors de vos prochains tours
-          </p>
-        </div>
-
-        <div className="bg-(--card) rounded-xl border border-(--border) p-4">
-          <div className="flex items-center justify-between mb-3 gap-2">
-            <div>
-              <AlertCircle size={20} className="text-red-600 mb-2" />
-              <h3 className="font-semibold">Cotisations en attente</h3>
-            </div>
-            <span className="text-xl font-bold text-red-600">{pendingCount}</span>
-          </div>
-          <p className="text-(--muted-foreground) text-sm">
-            Cotisations à payer pour éviter les pénalités
-          </p>
-        </div>
-
-        <div className="bg-(--card) rounded-xl border border-(--border) p-4">
-          <div className="flex items-center justify-between mb-3 gap-2">
-            <div>
-              <ArrowRight size={20} className="text-blue-600 mb-2" />
-              <h3 className="font-semibold">Score fiabilité</h3>
-            </div>
-            <span className="text-xl font-bold text-blue-600">{reliability}%</span>
-          </div>
-          <p className="text-(--muted-foreground) text-sm">
-            Indicateur de votre ponctualité dans les paiements
-          </p>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <SummaryCard
+          icon={Wallet}
+          iconClass="text-green-600"
+          valueClass="text-green-600"
+          title="Total épargné"
+          value={formatCurrency(totalSaved)}
+          description="Épargne accumulée dans vos tontines"
+        />
+        <SummaryCard
+          icon={TrendingUp}
+          iconClass="text-amber-600"
+          valueClass="text-amber-600"
+          title="À recevoir"
+          value={formatCurrency(totalToReceive)}
+          description="Attendu lors de vos prochains tours"
+        />
+        <SummaryCard
+          icon={AlertCircle}
+          iconClass="text-red-600"
+          valueClass="text-red-600"
+          title="Cotisations en attente"
+          value={String(pendingCount)}
+          description="À payer pour éviter les pénalités"
+        />
+        <SummaryCard
+          icon={ArrowRight}
+          iconClass="text-blue-600"
+          valueClass="text-blue-600"
+          title="Score fiabilité"
+          value={`${reliability}%`}
+          description="Votre ponctualité dans les paiements"
+        />
       </div>
 
       {/* Historique des transactions */}
       <section>
-        <h2 className="text-xl font-semibold mb-4">Historique des transactions</h2>
+        <h2 className="text-lg sm:text-xl font-semibold mb-4">Historique des transactions</h2>
 
         {transactions.length === 0 ? (
           <div className="bg-(--card) rounded-xl border border-(--border) text-center py-8">
@@ -142,17 +153,17 @@ export default async function WalletPage() {
             {transactions.map((tx) => {
               const isCredit = CREDIT_TYPES.includes(tx.type);
               return (
-                <div key={tx.id} className="flex items-center justify-between gap-3 p-4">
+                <div key={tx.id} className="flex items-center justify-between gap-3 p-3 sm:p-4">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
                       {tx.description ?? TYPE_LABELS[tx.type] ?? tx.type}
                     </p>
-                    <p className="text-xs text-(--muted-foreground)">
+                    <p className="text-xs text-(--muted-foreground) truncate">
                       {TYPE_LABELS[tx.type] ?? tx.type} · {formatDate(tx.createdAt)}
                     </p>
                   </div>
                   <span
-                    className={`font-semibold whitespace-nowrap ${
+                    className={`shrink-0 text-sm sm:text-base font-semibold whitespace-nowrap ${
                       isCredit ? "text-green-600" : "text-red-600"
                     }`}
                   >
@@ -167,15 +178,15 @@ export default async function WalletPage() {
       </section>
 
       {/* Actions rapides */}
-      <section className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Actions rapides</h2>
-        <div className="grid gap-4 md:grid-cols-3">
+      <section>
+        <h2 className="text-lg sm:text-xl font-semibold mb-4">Actions rapides</h2>
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
           <Link
             href="/tontines/new"
-            className="bg-(--card) rounded-xl border border-(--border) p-6 text-center flex flex-col items-center justify-center hover:bg-(--muted) transition"
+            className="bg-(--card) rounded-xl border border-(--border) p-4 sm:p-6 text-center flex flex-col items-center justify-center hover:bg-(--muted) transition"
           >
             <Plus size={24} className="mb-3 text-green-600" />
-            <h3 className="font-semibold mb-2">Créer une tontine</h3>
+            <h3 className="font-semibold mb-1">Créer une tontine</h3>
             <p className="text-(--muted-foreground) text-sm">
               Démarrez votre propre groupe d&apos;épargne
             </p>
@@ -183,23 +194,23 @@ export default async function WalletPage() {
 
           <Link
             href="/tontines/join"
-            className="bg-(--card) rounded-xl border border-(--border) p-6 text-center flex flex-col items-center justify-center hover:bg-(--muted) transition"
+            className="bg-(--card) rounded-xl border border-(--border) p-4 sm:p-6 text-center flex flex-col items-center justify-center hover:bg-(--muted) transition"
           >
             <MapPin size={24} className="mb-3 text-blue-600" />
-            <h3 className="font-semibold mb-2">Rejoindre une tontine</h3>
+            <h3 className="font-semibold mb-1">Rejoindre une tontine</h3>
             <p className="text-(--muted-foreground) text-sm">
-              Participez à un groupe existant avec un code d&apos;invitation
+              Participez à un groupe avec un code d&apos;invitation
             </p>
           </Link>
 
           <Link
             href="/settings"
-            className="bg-(--card) rounded-xl border border-(--border) p-6 text-center flex flex-col items-center justify-center hover:bg-(--muted) transition"
+            className="bg-(--card) rounded-xl border border-(--border) p-4 sm:p-6 text-center flex flex-col items-center justify-center hover:bg-(--muted) transition"
           >
             <Settings size={24} className="mb-3 text-purple-600" />
-            <h3 className="font-semibold mb-2">Paramètres</h3>
+            <h3 className="font-semibold mb-1">Paramètres</h3>
             <p className="text-(--muted-foreground) text-sm">
-              Gérez votre profil, notifications et préférences
+              Gérez votre profil et vos préférences
             </p>
           </Link>
         </div>

@@ -22,7 +22,7 @@ export default async function DashboardLayout({
     : 0;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-(--muted)">
+    <div className="flex h-dvh overflow-hidden bg-(--muted)">
       {/* Sidebar desktop */}
       <Sidebar user={session.user} />
 
@@ -32,7 +32,7 @@ export default async function DashboardLayout({
         <TopBar user={session.user} unreadCount={unreadCount} />
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-[calc(1rem_+_env(safe-area-inset-bottom))] md:p-6 lg:p-8">
           {children}
         </main>
       </div>
