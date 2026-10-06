@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TontineApp 🤝
 
-## Getting Started
+Application de tontine numérique pour l'Afrique de l'Ouest — PWA Next.js 16
 
-First, run the development server:
+## Stack Technique
+- **Framework** : Next.js 16 (App Router) + TypeScript
+- **Styling** : Tailwind CSS v4
+- **Auth** : NextAuth.js v5
+- **BDD** : PostgreSQL (Supabase) + Prisma ORM
+- **State** : Zustand + TanStack Query v5
+- **Formulaires** : React Hook Form + Zod
+- **PWA** : @ducanh2912/next-pwa
+
+## Prérequis
+- Node.js ≥ 20
+- Un projet Supabase (voir `SUPABASE_SETUP.md`) ou PostgreSQL 14+
+
+## Installation
 
 ```bash
+# Installer les dépendances
+npm install
+
+# Copier les variables d'environnement
+cp .env.example .env.local
+# Remplir les valeurs dans .env.local
+
+# Générer le client Prisma
+npx prisma generate
+
+# Créer la base de données et migrer
+npx prisma migrate dev --name init
+
+# Lancer le serveur de développement
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Structure du projet
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+├── app/
+│   ├── (auth)/          # Login, Register
+│   ├── (dashboard)/     # Dashboard, Tontines, Wallet
+│   ├── api/             # Route Handlers API
+│   └── page.tsx         # Landing page
+├── auth.ts              # NextAuth v5 config
+├── middleware.ts         # Protection des routes
+├── components/
+│   ├── dashboard/       # Sidebar, TopBar
+│   ├── tontine/         # Composants tontine
+│   └── providers.tsx    # Session + Query providers
+├── lib/
+│   ├── db.ts            # Prisma client singleton
+│   ├── utils.ts         # Utilitaires (cn, formatCurrency…)
+│   └── validations/     # Schémas Zod
+└── types/               # Types TypeScript
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API Routes
 
-## Learn More
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| POST | `/api/auth/register` | Créer un compte |
+| POST | `/api/auth/[...nextauth]` | Auth NextAuth |
+| GET | `/api/tontines` | Lister ses tontines |
+| POST | `/api/tontines` | Créer une tontine |
+| GET | `/api/tontines/[id]` | Détail d'une tontine |
+| PATCH | `/api/tontines/[id]` | Modifier (admin) |
+| DELETE | `/api/tontines/[id]` | Dissoudre (admin) |
+| POST | `/api/tontines/[id]/start` | Démarrer les cycles |
+| POST | `/api/tontines/join` | Rejoindre via code |
+| POST | `/api/contributions` | Enregistrer cotisation |
 
-To learn more about Next.js, take a look at the following resources:
+## Variables d'environnement requises
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Voir `.env.example` pour la liste complète.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Minimum pour démarrer :
+- `DATABASE_URL` : URL Supabase poolée (port 6543)
+- `DIRECT_URL` : URL Supabase directe (port 5432, migrations)
+- `AUTH_SECRET` : Secret NextAuth (générer avec `openssl rand -base64 32`)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Guide complet de connexion : voir [`SUPABASE_SETUP.md`](./SUPABASE_SETUP.md).

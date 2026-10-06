@@ -1,0 +1,327 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── AUTH MODELS ────────────────────────────────────────────────────────
+
+model User {
+  id               String          @id @default(cuid())
+  name             String?
+  email            String          @unique
+  emailVerified    DateTime?
+  phone            String?         @unique
+  phoneVerified    DateTime?
+  image            String?
+  password         String?
+  preferences      Json?         // Store notification preferences as JSON
+
+  // KYC
+  kycStatus        KycStatus       @default(PENDING)
+  kycDocumentUrl   String?
+  kycVerifiedAt    DateTime?
+
+  // Profile
+  reliabilityScore Float           @default(100.0)
+  totalSaved       Float           @default(0)
+
+  // Relations
+  accounts         Account[]
+  auditLogs        AuditLog[]
+  contributions    Contribution[]
+  notifications    Notification[]
+  sessions         Session[]
+  tontineMembers   TontineMember[]
+  transactions     Transaction[]
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── TONTINE MODELS ────────────────────────────────────────────────────
+
+model Tontine {
+  id                String          @id @default(cuid())
+  name              String
+  description       String?
+  slug              String          @unique
+  amount            Float
+  currency          String          @default("XOF")
+  frequency         Frequency       @default(MONTHLY)
+  maxMembers        Int
+  rotationMode      RotationMode    @default(MANUAL)
+  status            TontineStatus   @default(DRAFT)
+  latePenaltyAmount Float           @default(0)
+  latePenaltyType   PenaltyType     @default(FIXED)
+  maxLatePayments   Int             @default(3)
+  requireGuarantee  Boolean         @default(false)
+  guaranteeAmount   Float?
+  allowPositionSwap Boolean         @default(true)
+  isPrivate         Boolean         @default(true)
+  inviteCode        String          @unique @default(cuid())
+  commissionRate    Float           @default(0.01)
+  startDate         DateTime?
+  endDate           DateTime?
+  currentCycle      Int             @default(0)
+  totalCycles       Int             @default(0)
+  creatorId         String
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  auditLogs         AuditLog[]
+  cycles            Cycle[]
+  notifications     Notification[]
+  members           TontineMember[]
+  transactions      Transaction[]
+}
+
+model TontineMember {
+  id               String         @id @default(cuid())
+  tontineId        String
+  userId           String
+  role             MemberRole     @default(MEMBER)
+  status           MemberStatus   @default(INVITED)
+  rotationPosition Int?
+  hasReceivedPot   Boolean        @default(false)
+  guaranteePaid    Boolean        @default(false)
+  latePayments     Int            @default(0)
+  joinedAt         DateTime?
+  invitedAt        DateTime       @default(now())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  contributions    Contribution[]
+  tontine          Tontine        @relation(fields: [tontineId], references: [id], onDelete: Cascade)
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tontineId, userId])
+}
+
+model Cycle {
+  id               String         @id @default(cuid())
+  tontineId        String
+  cycleNumber      Int
+  beneficiaryId    String?
+  totalAmount      Float
+  collectedAmount  Float          @default(0)
+  commissionAmount Float          @default(0)
+  startDate        DateTime
+  dueDate          DateTime
+  disbursementDate DateTime?
+  status           CycleStatus    @default(UPCOMING)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  contributions    Contribution[]
+  tontine          Tontine        @relation(fields: [tontineId], references: [id], onDelete: Cascade)
+
+  @@unique([tontineId, cycleNumber])
+}
+
+model Contribution {
+  id             String             @id @default(cuid())
+  cycleId        String
+  memberId       String
+  userId         String
+  amount         Float
+  penaltyAmount  Float              @default(0)
+  status         ContributionStatus @default(PENDING)
+  paymentMethod  PaymentMethod?
+  transactionRef String?
+  paidAt         DateTime?
+  dueDate        DateTime
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  cycle          Cycle              @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  member         TontineMember      @relation(fields: [memberId], references: [id])
+  user           User               @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id            String            @id @default(cuid())
+  userId        String
+  tontineId     String?
+  type          TransactionType
+  amount        Float
+  currency      String            @default("XOF")
+  status        TransactionStatus @default(PENDING)
+  paymentMethod PaymentMethod?
+  reference     String?           @unique
+  description   String?
+  metadata      Json?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  tontine       Tontine?          @relation(fields: [tontineId], references: [id])
+  user          User              @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  tontineId String?
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  data      Json?
+  createdAt DateTime         @default(now())
+  tontine   Tontine?         @relation(fields: [tontineId], references: [id])
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  tontineId String?
+  action    String
+  entity    String
+  entityId  String?
+  before    Json?
+  after     Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  tontine   Tontine? @relation(fields: [tontineId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+// ─── ENUMS ─────────────────────────────────────────────────────────────
+
+enum KycStatus {
+  PENDING
+  SUBMITTED
+  VERIFIED
+  REJECTED
+}
+
+enum Frequency {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum PenaltyType {
+  FIXED
+  PERCENTAGE
+}
+
+enum RotationMode {
+  MANUAL
+  RANDOM
+  AUCTION
+}
+
+enum TontineStatus {
+  DRAFT
+  PENDING    // En attente de membres
+  ACTIVE     // En cours
+  COMPLETED  // Terminée
+  DISSOLVED  // Dissoute avant terme
+}
+
+enum MemberRole {
+  ADMIN
+  CO_ADMIN
+  MEMBER
+}
+
+enum MemberStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+  EXCLUDED
+}
+
+enum CycleStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+  FAILED
+}
+
+enum ContributionStatus {
+  PENDING
+  PAID
+  LATE
+  EXCUSED
+  CANCELLED
+}
+
+enum TransactionType {
+  CONTRIBUTION     // Cotisation
+  DISBURSEMENT     // Versement au bénéficiaire
+  PENALTY          // Pénalité
+  COMMISSION       // Commission plateforme
+  GUARANTEE_IN     // Dépôt caution
+  GUARANTEE_OUT    // Remboursement caution
+  REFUND           // Remboursement
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  ORANGE_MONEY
+  MTN_MOMO
+  WAVE
+  MOOV_MONEY
+  FREE_MONEY
+  BANK_TRANSFER
+  CASH            // Pour le MVP : enregistrement manuel
+}
+
+enum NotificationType {
+  CONTRIBUTION_DUE     // Rappel cotisation
+  CONTRIBUTION_PAID    // Cotisation reçue
+  CONTRIBUTION_LATE    // Cotisation en retard
+  POT_RECEIVED         // Vous avez reçu la cagnotte
+  MEMBER_JOINED        // Nouveau membre
+  MEMBER_LEFT          // Membre parti
+  CYCLE_STARTED        // Nouveau cycle démarré
+  CYCLE_COMPLETED      // Cycle terminé
+  TONTINE_STARTED      // Tontine démarrée
+  TONTINE_COMPLETED    // Tontine terminée
+  PENALTY_APPLIED      // Pénalité appliquée
+  ANNOUNCEMENT         // Annonce de l'admin
+}
