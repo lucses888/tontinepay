@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { formatCurrency, formatDate, calculateProgress } from "@/lib/utils";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Handshake } from "lucide-react";
 import type { TontineStatus } from "@/types";
 
 interface SearchParams {
@@ -59,7 +59,7 @@ export default async function TontinesPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Mes tontines</h2>
+          <h2 className="page-title">Mes tontines</h2>
           <p className="text-(--muted-foreground) mt-1">
             {tontines.length} tontine{tontines.length !== 1 ? "s" : ""}
           </p>
@@ -67,13 +67,13 @@ export default async function TontinesPage({
         <div className="flex gap-3">
           <Link
             href="/tontines/join"
-            className="px-4 py-2 rounded-lg border border-(--border) text-sm font-medium hover:bg-(--muted) transition"
+            className="btn-secondary"
           >
             Rejoindre
           </Link>
           <Link
             href="/tontines/new"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition"
+            className="btn-primary"
           >
             <Plus size={16} />
             Nouvelle
@@ -95,7 +95,7 @@ export default async function TontinesPage({
               name="q"
               defaultValue={q}
               placeholder="Rechercher une tontine..."
-              className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-(--border) bg-(--card) text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="input-field pl-9"
             />
           </form>
         </div>
@@ -121,14 +121,16 @@ export default async function TontinesPage({
       {/* Tontines grid */}
       {tontines.length === 0 ? (
         <div className="text-center py-16">
-          <div className="text-5xl mb-4">🤝</div>
+          <div className="w-16 h-16 rounded-full bg-brand-soft flex items-center justify-center mx-auto mb-4">
+            <Handshake size={28} className="text-brand" />
+          </div>
           <h3 className="text-lg font-semibold mb-2">Aucune tontine trouvée</h3>
           <p className="text-(--muted-foreground) mb-6 text-sm">
             Créez votre première tontine ou rejoignez un groupe existant
           </p>
           <Link
             href="/tontines/new"
-            className="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-green-700"
+            className="btn-primary"
           >
             <Plus size={16} />
             Créer une tontine
@@ -153,7 +155,7 @@ export default async function TontinesPage({
                 {/* Top row */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0 pr-2">
-                    <h4 className="font-semibold text-base truncate group-hover:text-green-600 transition-colors">
+                    <h4 className="font-semibold text-base truncate group-hover:text-brand transition-colors">
                       {t.name}
                     </h4>
                     <p className="text-sm text-(--muted-foreground) mt-0.5">
@@ -164,7 +166,7 @@ export default async function TontinesPage({
                 </div>
 
                 {/* Amount */}
-                <p className="text-2xl font-bold text-green-600 mb-1">
+                <p className="text-2xl font-bold text-brand mb-1">
                   {formatCurrency(t.amount)}
                   <span className="text-sm text-(--muted-foreground) font-normal"> /cycle</span>
                 </p>
@@ -178,7 +180,7 @@ export default async function TontinesPage({
                     </div>
                     <div className="h-1.5 bg-(--muted) rounded-full">
                       <div
-                        className="h-full bg-green-500 rounded-full transition-all"
+                        className="h-full bg-brand rounded-full transition-all"
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -195,7 +197,7 @@ export default async function TontinesPage({
                     {avatars.map((m) => (
                       <div
                         key={m.id}
-                        className="w-7 h-7 rounded-full bg-green-100 text-green-700 text-xs font-semibold flex items-center justify-center ring-2 ring-(--card)"
+                        className="w-7 h-7 rounded-full bg-brand-soft text-brand-deep text-xs font-semibold flex items-center justify-center ring-2 ring-(--card)"
                         title={m.user.name ?? ""}
                       >
                         {(m.user.name ?? "?")[0].toUpperCase()}
@@ -210,7 +212,7 @@ export default async function TontinesPage({
 
                   {/* Role badge */}
                   {(userMember?.role === "ADMIN" || userMember?.role === "CO_ADMIN") && (
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                    <span className="badge badge-green">
                       Admin
                     </span>
                   )}
@@ -236,17 +238,17 @@ const STATUS_CONFIG: Record<
   TontineStatus,
   { label: string; className: string }
 > = {
-  DRAFT: { label: "Brouillon", className: "bg-gray-100 text-gray-600" },
-  PENDING: { label: "En attente", className: "bg-amber-100 text-amber-700" },
-  ACTIVE: { label: "Active", className: "bg-green-100 text-green-700" },
-  COMPLETED: { label: "Terminée", className: "bg-blue-100 text-blue-700" },
-  DISSOLVED: { label: "Dissoute", className: "bg-red-100 text-red-700" },
+  DRAFT: { label: "Brouillon", className: "badge-gray" },
+  PENDING: { label: "En attente", className: "badge-amber" },
+  ACTIVE: { label: "Active", className: "badge-green" },
+  COMPLETED: { label: "Terminée", className: "badge-blue" },
+  DISSOLVED: { label: "Dissoute", className: "badge-red" },
 };
 
 function StatusBadge({ status }: { status: TontineStatus }) {
   const config = STATUS_CONFIG[status];
   return (
-    <span className={`text-xs font-medium px-2 py-1 rounded-full shrink-0 ${config.className}`}>
+    <span className={`badge shrink-0 ${config.className}`}>
       {config.label}
     </span>
   );

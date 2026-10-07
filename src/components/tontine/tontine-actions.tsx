@@ -59,10 +59,10 @@ export function TontineActions({ tontine, isAdmin }: TontineActionsProps) {
       {(tontine.status === "DRAFT" || tontine.status === "PENDING") && (
         <button
           onClick={copyInviteLink}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-(--border) text-sm hover:bg-(--muted) transition"
+          className="btn-secondary"
           title="Copier le lien d'invitation"
         >
-          {copying ? <Check size={15} className="text-green-600" /> : <Copy size={15} />}
+          {copying ? <Check size={15} className="text-brand" /> : <Copy size={15} />}
           {copying ? "Copié !" : "Inviter"}
         </button>
       )}
@@ -72,7 +72,7 @@ export function TontineActions({ tontine, isAdmin }: TontineActionsProps) {
         <button
           onClick={startTontine}
           disabled={starting}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:opacity-60 transition"
+          className="btn-primary"
         >
           {starting ? (
             <Loader2 size={15} className="animate-spin" />

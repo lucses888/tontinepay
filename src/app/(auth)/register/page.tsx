@@ -56,7 +56,7 @@ export default function RegisterPage() {
   return (
     <div className="w-full max-w-sm mx-auto lg:max-w-md">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Créer un compte 🎉</h1>
+        <h1 className="page-title text-3xl">Créer un compte</h1>
         <p className="mt-2 text-(--muted-foreground)">
           Rejoignez des milliers de membres qui épargnent ensemble
         </p>
@@ -65,7 +65,7 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         {/* Nom complet */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1.5">
+          <label htmlFor="name" className="form-label">
             Nom complet
           </label>
           <input
@@ -73,17 +73,15 @@ export default function RegisterPage() {
             id="name"
             type="text"
             autoComplete="name"
-            placeholder="Mamadou Diallo"
-            className="w-full px-4 py-2.5 rounded-lg border border-(--border) bg-(--card) focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+            placeholder="Aya Konan"
+            className="input-field"
           />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
-          )}
+          {errors.name && <p className="form-error">{errors.name.message}</p>}
         </div>
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1.5">
+          <label htmlFor="email" className="form-label">
             Email
           </label>
           <input
@@ -92,20 +90,18 @@ export default function RegisterPage() {
             type="email"
             autoComplete="email"
             placeholder="vous@exemple.com"
-            className="w-full px-4 py-2.5 rounded-lg border border-(--border) bg-(--card) focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+            className="input-field"
           />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="form-error">{errors.email.message}</p>}
         </div>
 
         {/* Téléphone */}
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium mb-1.5">
+          <label htmlFor="phone" className="form-label">
             Téléphone
           </label>
           <div className="flex gap-2">
-            <div className="flex items-center px-3 py-2.5 rounded-lg border border-(--border) bg-(--muted) text-sm font-medium">
+            <div className="flex shrink-0 items-center rounded-[0.625rem] border border-(--border) bg-(--muted) px-3 text-sm font-medium text-(--muted-foreground)">
               🇨🇮 +225
             </div>
             <input
@@ -114,17 +110,15 @@ export default function RegisterPage() {
               type="tel"
               autoComplete="tel"
               placeholder="07 XX XX XX XX"
-              className="flex-1 px-4 py-2.5 rounded-lg border border-(--border) bg-(--card) focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+              className="input-field"
             />
           </div>
-          {errors.phone && (
-            <p className="mt-1 text-sm text-red-500">{errors.phone.message}</p>
-          )}
+          {errors.phone && <p className="form-error">{errors.phone.message}</p>}
         </div>
 
         {/* Mot de passe */}
         <div>
-          <label htmlFor="password" className="block text-sm font-medium mb-1.5">
+          <label htmlFor="password" className="form-label">
             Mot de passe
           </label>
           <div className="relative">
@@ -134,12 +128,13 @@ export default function RegisterPage() {
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 pr-12 rounded-lg border border-(--border) bg-(--card) focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+              className="input-field pr-11"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-(--muted-foreground)"
+              className="absolute top-1/2 right-3 -translate-y-1/2 text-(--muted-foreground) transition hover:text-(--foreground)"
+              aria-label={showPassword ? "Masquer" : "Afficher"}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -155,20 +150,25 @@ export default function RegisterPage() {
                 <div key={label} className="flex items-center gap-2 text-xs">
                   <Check
                     size={12}
-                    className={check ? "text-green-500" : "text-gray-300"}
+                    className={check ? "text-brand" : "text-[#c9d2cc]"}
                   />
-                  <span className={check ? "text-green-600" : "text-(--muted-foreground)"}>
+                  <span
+                    className={check ? "font-medium text-brand" : "text-(--muted-foreground)"}
+                  >
                     {label}
                   </span>
                 </div>
               ))}
             </div>
           )}
+          {errors.password && (
+            <p className="form-error">{errors.password.message}</p>
+          )}
         </div>
 
         {/* Confirmer mot de passe */}
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1.5">
+          <label htmlFor="confirmPassword" className="form-label">
             Confirmer le mot de passe
           </label>
           <div className="relative">
@@ -178,36 +178,33 @@ export default function RegisterPage() {
               type={showConfirm ? "text" : "password"}
               autoComplete="new-password"
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 pr-12 rounded-lg border border-(--border) bg-(--card) focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+              className="input-field pr-11"
             />
             <button
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-(--muted-foreground)"
+              className="absolute top-1/2 right-3 -translate-y-1/2 text-(--muted-foreground) transition hover:text-(--foreground)"
+              aria-label={showConfirm ? "Masquer" : "Afficher"}
             >
               {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
+            <p className="form-error">{errors.confirmPassword.message}</p>
           )}
         </div>
 
         {/* Erreur serveur */}
-        {serverError && (
-          <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-            {serverError}
-          </div>
-        )}
+        {serverError && <div className="alert-error">{serverError}</div>}
 
         {/* CGU */}
-        <p className="text-xs text-(--muted-foreground) text-center">
+        <p className="text-center text-xs text-(--muted-foreground)">
           En créant un compte, vous acceptez nos{" "}
-          <Link href="/terms" className="text-green-600 hover:underline">
+          <Link href="/terms" className="font-medium text-brand hover:underline">
             CGU
           </Link>{" "}
           et notre{" "}
-          <Link href="/privacy" className="text-green-600 hover:underline">
+          <Link href="/privacy" className="font-medium text-brand hover:underline">
             Politique de confidentialité
           </Link>
         </p>
@@ -216,7 +213,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-semibold py-2.5 rounded-lg transition"
+          className="btn-primary w-full py-3"
         >
           {isSubmitting ? (
             <Loader2 size={18} className="animate-spin" />
@@ -229,7 +226,7 @@ export default function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-(--muted-foreground)">
         Déjà un compte ?{" "}
-        <Link href="/login" className="text-green-600 font-semibold hover:underline">
+        <Link href="/login" className="font-semibold text-brand hover:underline">
           Se connecter
         </Link>
       </p>

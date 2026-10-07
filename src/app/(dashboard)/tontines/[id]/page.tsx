@@ -85,12 +85,12 @@ export default async function TontineDetailPage({
             <div className="flex items-center gap-3 mb-2">
               <StatusBadge status={tontine.status} />
               {isAdmin && (
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+                <span className="badge badge-green">
                   Administrateur
                 </span>
               )}
             </div>
-            <h2 className="text-2xl font-bold">{tontine.name}</h2>
+            <h2 className="page-title">{tontine.name}</h2>
             {tontine.description && (
               <p className="text-(--muted-foreground) mt-1 text-sm">{tontine.description}</p>
             )}
@@ -111,12 +111,12 @@ export default async function TontineDetailPage({
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-(--border)">
           <Stat
-            icon={<Wallet size={18} className="text-green-600" />}
+            icon={<Wallet size={18} className="text-brand" />}
             label="Cotisation"
             value={formatCurrency(tontine.amount)}
           />
           <Stat
-            icon={<Calendar size={18} className="text-blue-600" />}
+            icon={<Calendar size={18} className="text-info" />}
             label="Fréquence"
             value={FREQ_LABELS[tontine.frequency]}
           />
@@ -144,8 +144,8 @@ export default async function TontineDetailPage({
         <div
           className={`rounded-xl border p-5 ${
             userContrib?.status === "PAID"
-              ? "bg-green-50 border-green-200"
-              : "bg-amber-50 border-amber-200"
+              ? "bg-brand-soft border-[#bfe4cf]"
+              : "bg-warning-soft border-[#f3dfa5]"
           }`}
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -155,8 +155,8 @@ export default async function TontineDetailPage({
                   size={16}
                   className={
                     userContrib?.status === "PAID"
-                      ? "text-green-600"
-                      : "text-amber-600"
+                      ? "text-brand"
+                      : "text-warning"
                   }
                 />
                 <span className="font-semibold text-sm">
@@ -187,11 +187,11 @@ export default async function TontineDetailPage({
                 <div className="w-14 h-14 relative">
                   {/* Circular progress */}
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" strokeWidth="3" />
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e6e4dc" strokeWidth="3" />
                     <circle
                       cx="18" cy="18" r="15.9"
                       fill="none"
-                      stroke="#16a34a"
+                      stroke="#0a7b44"
                       strokeWidth="3"
                       strokeDasharray={`${totalProgress} ${100 - totalProgress}`}
                       strokeLinecap="round"
@@ -207,14 +207,14 @@ export default async function TontineDetailPage({
 
           {/* My payment status */}
           {userMember && (
-            <div className="mt-3 pt-3 border-t border-white/50 flex items-center justify-between">
+            <div className="mt-3 pt-3 border-t border-[#0a7b44]/10 flex items-center justify-between">
               <span className="text-sm">
                 Mon statut :{" "}
                 <strong
                   className={
                     userContrib?.status === "PAID"
-                      ? "text-green-700"
-                      : "text-amber-700"
+                      ? "text-brand-deep"
+                      : "text-warning"
                   }
                 >
                   {userContrib?.status === "PAID"
@@ -279,15 +279,15 @@ function Stat({
 
 function StatusBadge({ status }: { status: string }) {
   const CONFIG: Record<string, { label: string; className: string }> = {
-    DRAFT: { label: "Brouillon", className: "bg-gray-100 text-gray-600" },
-    PENDING: { label: "En attente", className: "bg-amber-100 text-amber-700" },
-    ACTIVE: { label: "Active", className: "bg-green-100 text-green-700" },
-    COMPLETED: { label: "Terminée", className: "bg-blue-100 text-blue-700" },
-    DISSOLVED: { label: "Dissoute", className: "bg-red-100 text-red-700" },
+    DRAFT: { label: "Brouillon", className: "badge-gray" },
+    PENDING: { label: "En attente", className: "badge-amber" },
+    ACTIVE: { label: "Active", className: "badge-green" },
+    COMPLETED: { label: "Terminée", className: "badge-blue" },
+    DISSOLVED: { label: "Dissoute", className: "badge-red" },
   };
   const cfg = CONFIG[status] ?? { label: status, className: "" };
   return (
-    <span className={`text-xs font-medium px-2 py-1 rounded-full ${cfg.className}`}>
+    <span className={`badge ${cfg.className}`}>
       {cfg.label}
     </span>
   );

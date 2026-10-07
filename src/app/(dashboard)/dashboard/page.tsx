@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 import { formatCurrency, formatDate, calculateProgress } from "@/lib/utils";
 import {
-  ArrowRight, TrendingUp, Users, Wallet, AlertCircle, Plus
+  ArrowRight, TrendingUp, Users, Wallet, AlertCircle, Plus, Compass, Handshake,
 } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -51,53 +51,53 @@ export default async function DashboardPage() {
   const activeTontineCount = activeTontines.length;
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="max-w-6xl space-y-8">
       {/* Greeting */}
       <div>
-        <h2 className="text-2xl font-bold">
+        <h2 className="page-title text-2xl sm:text-3xl">
           Bonjour, {user?.name?.split(" ")[0]} 👋
         </h2>
-        <p className="text-(--muted-foreground) mt-1">
+        <p className="mt-1 text-(--muted-foreground)">
           Voici un aperçu de vos tontines
         </p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard
           label="Total épargné"
           value={formatCurrency(totalSaved)}
-          icon={<TrendingUp size={20} className="text-green-600" />}
-          bgColor="bg-green-50"
+          icon={<TrendingUp size={20} className="text-brand" />}
+          iconBg="bg-brand-soft"
         />
         <KpiCard
           label="Tontines actives"
           value={String(activeTontineCount)}
-          icon={<Users size={20} className="text-blue-600" />}
-          bgColor="bg-blue-50"
+          icon={<Users size={20} className="text-info" />}
+          iconBg="bg-info-soft"
         />
         <KpiCard
           label="Cotisations en attente"
           value={String(pendingContributions)}
-          icon={<AlertCircle size={20} className="text-amber-600" />}
-          bgColor="bg-amber-50"
+          icon={<AlertCircle size={20} className="text-warning" />}
+          iconBg="bg-warning-soft"
           highlight={pendingContributions > 0}
         />
         <KpiCard
           label="Score fiabilité"
           value={`${user?.reliabilityScore ?? 100}%`}
-          icon={<Wallet size={20} className="text-purple-600" />}
-          bgColor="bg-purple-50"
+          icon={<Wallet size={20} className="text-[#7c5cbf]" />}
+          iconBg="bg-[#f0eafc]"
         />
       </div>
 
-      {/* Active Tontines */}
+      {/* Tontines actives */}
       <section>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Tontines actives</h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="font-display text-lg font-bold">Tontines actives</h3>
           <Link
             href="/tontines"
-            className="flex items-center gap-1 text-sm text-green-600 hover:underline"
+            className="flex items-center gap-1 text-sm font-medium text-brand hover:underline"
           >
             Voir tout <ArrowRight size={14} />
           </Link>
@@ -119,44 +119,38 @@ export default async function DashboardPage() {
                 <Link
                   key={t.id}
                   href={`/tontines/${t.id}`}
-                  className="block bg-(--card) rounded-xl border border-(--border) p-5 card-hover"
+                  className="card-hover block rounded-xl border border-(--border) bg-white p-5"
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="mb-3 flex items-start justify-between">
                     <div>
-                      <h4 className="font-semibold truncate max-w-[160px]">{t.name}</h4>
+                      <h4 className="max-w-[160px] truncate font-semibold">{t.name}</h4>
                       <p className="text-sm text-(--muted-foreground)">
                         Cycle {t.currentCycle}/{t.totalCycles}
                       </p>
                     </div>
-                    <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        hasPaid
-                          ? "bg-green-100 text-green-700"
-                          : "bg-amber-100 text-amber-700"
-                      }`}
-                    >
-                      {hasPaid ? "✓ Payé" : "En attente"}
+                    <span className={`badge ${hasPaid ? "badge-green" : "badge-amber"}`}>
+                      {hasPaid ? "Payé" : "En attente"}
                     </span>
                   </div>
 
-                  <p className="text-2xl font-bold text-green-600 mb-3">
+                  <p className="mb-3 font-display text-2xl font-bold text-brand">
                     {formatCurrency(t.amount)}
-                    <span className="text-sm text-(--muted-foreground) font-normal"> / cycle</span>
+                    <span className="text-sm font-normal text-(--muted-foreground)"> / cycle</span>
                   </p>
 
-                  {/* Progress bar */}
+                  {/* Barre de progression */}
                   <div>
-                    <div className="flex justify-between text-xs text-(--muted-foreground) mb-1">
+                    <div className="mb-1 flex justify-between text-xs text-(--muted-foreground)">
                       <span>Collecte</span>
                       <span>{progress}%</span>
                     </div>
-                    <div className="h-2 bg-(--muted) rounded-full overflow-hidden">
+                    <div className="h-2 overflow-hidden rounded-full bg-(--muted)">
                       <div
-                        className="h-full bg-green-500 rounded-full transition-all"
+                        className="h-full rounded-full bg-brand transition-all"
                         style={{ width: `${progress}%` }}
                       />
                     </div>
-                    <div className="flex justify-between text-xs mt-1">
+                    <div className="mt-1 flex justify-between text-xs">
                       <span className="text-(--muted-foreground)">
                         {formatCurrency(activeCycle?.collectedAmount ?? 0)} collectés
                       </span>
@@ -167,7 +161,7 @@ export default async function DashboardPage() {
                   </div>
 
                   {activeCycle && (
-                    <p className="text-xs text-(--muted-foreground) mt-2">
+                    <p className="mt-2 text-xs text-(--muted-foreground)">
                       Échéance : {formatDate(activeCycle.dueDate)}
                     </p>
                   )}
@@ -178,11 +172,11 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      {/* Recent Transactions */}
+      {/* Transactions récentes */}
       {recentTransactions.length > 0 && (
         <section>
-          <h3 className="text-lg font-semibold mb-4">Transactions récentes</h3>
-          <div className="bg-(--card) rounded-xl border border-(--border) divide-y divide-(--border)">
+          <h3 className="mb-4 font-display text-lg font-bold">Transactions récentes</h3>
+          <div className="divide-y divide-(--border) rounded-xl border border-(--border) bg-white">
             {recentTransactions.map((tx) => (
               <div key={tx.id} className="flex items-center justify-between p-4">
                 <div>
@@ -192,10 +186,8 @@ export default async function DashboardPage() {
                   </p>
                 </div>
                 <span
-                  className={`font-semibold text-sm ${
-                    tx.type === "DISBURSEMENT"
-                      ? "text-green-600"
-                      : "text-(--foreground)"
+                  className={`text-sm font-semibold ${
+                    tx.type === "DISBURSEMENT" ? "text-brand" : "text-(--foreground)"
                   }`}
                 >
                   {tx.type === "DISBURSEMENT" ? "+" : "-"}
@@ -216,50 +208,47 @@ function KpiCard({
   label,
   value,
   icon,
-  bgColor,
+  iconBg,
   highlight,
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
-  bgColor: string;
+  iconBg: string;
   highlight?: boolean;
 }) {
   return (
     <div
-      className={`bg-(--card) rounded-xl border p-4 ${
-        highlight ? "border-amber-300" : "border-(--border)"
+      className={`rounded-xl border bg-white p-4 ${
+        highlight ? "border-[#f3dfa5] bg-warning-soft/40" : "border-(--border)"
       }`}
     >
-      <div className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center mb-3`}>
+      <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${iconBg}`}>
         {icon}
       </div>
-      <p className="text-2xl font-bold">{value}</p>
-      <p className="text-sm text-(--muted-foreground) mt-0.5">{label}</p>
+      <p className="font-display text-2xl font-bold">{value}</p>
+      <p className="mt-0.5 text-sm text-(--muted-foreground)">{label}</p>
     </div>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="bg-(--card) rounded-xl border border-(--border) border-dashed p-12 text-center">
-      <div className="text-5xl mb-4">🤝</div>
-      <h3 className="font-semibold text-lg mb-2">Aucune tontine active</h3>
-      <p className="text-(--muted-foreground) text-sm mb-6">
+    <div className="rounded-xl border border-dashed border-(--border) bg-white p-12 text-center">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-soft">
+        <Handshake size={26} className="text-brand" />
+      </div>
+      <h3 className="mb-2 font-display text-lg font-bold">Aucune tontine active</h3>
+      <p className="mb-6 text-sm text-(--muted-foreground)">
         Créez votre première tontine ou rejoignez un groupe existant
       </p>
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <Link
-          href="/tontines/new"
-          className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 transition"
-        >
+      <div className="flex flex-col justify-center gap-3 sm:flex-row">
+        <Link href="/tontines/new" className="btn-primary">
           <Plus size={16} />
           Créer une tontine
         </Link>
-        <Link
-          href="/tontines/join"
-          className="flex items-center gap-2 border border-(--border) px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-(--muted) transition"
-        >
+        <Link href="/tontines/join" className="btn-secondary">
+          <Compass size={16} />
           Rejoindre avec un code
         </Link>
       </div>

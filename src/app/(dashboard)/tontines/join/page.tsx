@@ -56,7 +56,7 @@ export default function JoinTontinePage() {
   return (
     <div className="max-w-md mx-auto">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold">Rejoindre une tontine</h2>
+        <h2 className="page-title">Rejoindre une tontine</h2>
         <p className="text-(--muted-foreground) mt-1">
           Entrez le code d&apos;invitation ou collez le lien reçu
         </p>
@@ -65,7 +65,7 @@ export default function JoinTontinePage() {
       <div className="bg-(--card) rounded-xl border border-(--border) p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-1.5">
+            <label className="form-label">
               Code d&apos;invitation
             </label>
             <div className="relative">
@@ -82,18 +82,18 @@ export default function JoinTontinePage() {
               />
             </div>
             {errors.inviteCode && (
-              <p className="mt-1 text-sm text-red-500">{errors.inviteCode.message}</p>
+              <p className="form-error">{errors.inviteCode.message}</p>
             )}
           </div>
 
           {serverError && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+            <div className="alert-error">
               {serverError}
             </div>
           )}
 
           {successMessage && (
-            <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+            <div className="alert-success">
               ✓ {successMessage}
             </div>
           )}
@@ -101,7 +101,7 @@ export default function JoinTontinePage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-60 transition"
+            className="btn-primary w-full"
           >
             {isSubmitting ? (
               <Loader2 size={16} className="animate-spin" />

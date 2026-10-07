@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
   // Activer les Server Actions
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000"],
+      allowedOrigins: ["localhost:3000", "tontines-green.vercel.app"],
     },
   },
 };

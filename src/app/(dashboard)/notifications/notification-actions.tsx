@@ -9,11 +9,7 @@ export function BackButton() {
   const router = useRouter();
 
   return (
-    <button
-      type="button"
-      onClick={() => router.back()}
-      className="flex items-center gap-2 px-3 py-2 rounded-lg border border-(--border) hover:bg-(--muted) transition"
-    >
+    <button type="button" onClick={() => router.back()} className="btn-secondary">
       <ArrowLeft size={20} />
       Retour
     </button>
@@ -34,7 +30,7 @@ export function MarkAllReadButton({ disabled = false }: { disabled?: boolean }) 
           router.refresh();
         })
       }
-      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border border-(--border) text-sm font-medium hover:bg-(--muted) transition disabled:opacity-50"
+      className="btn-secondary"
     >
       {isPending && <Loader2 size={16} className="animate-spin" />}
       Marquer tout comme lu

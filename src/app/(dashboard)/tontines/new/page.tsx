@@ -87,7 +87,7 @@ export default function CreateTontinePage() {
     <div className="max-w-2xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold">Créer une tontine</h2>
+        <h2 className="page-title">Créer une tontine</h2>
         <p className="text-(--muted-foreground) mt-1">
           Configurez votre groupe d&apos;épargne en quelques étapes
         </p>
@@ -101,9 +101,9 @@ export default function CreateTontinePage() {
               <div
                 className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
                   step > s.id
-                    ? "bg-green-600 text-white"
+                    ? "bg-brand text-white"
                     : step === s.id
-                    ? "bg-green-600 text-white ring-4 ring-green-100"
+                    ? "bg-brand text-white ring-4 ring-brand-soft"
                     : "bg-(--muted) text-(--muted-foreground)"
                 }`}
               >
@@ -114,7 +114,7 @@ export default function CreateTontinePage() {
             {i < STEPS.length - 1 && (
               <div
                 className={`flex-1 h-0.5 mx-2 mb-5 transition-colors ${
-                  step > s.id ? "bg-green-600" : "bg-(--border)"
+                  step > s.id ? "bg-brand" : "bg-(--border)"
                 }`}
               />
             )}
@@ -132,8 +132,8 @@ export default function CreateTontinePage() {
               <h3 className="font-semibold text-lg">Informations générales</h3>
 
               <div>
-                <label className="block text-sm font-medium mb-1.5">
-                  Nom de la tontine <span className="text-red-500">*</span>
+                <label className="form-label">
+                  Nom de la tontine <span className="text-danger">*</span>
                 </label>
                 <input
                   {...register("name")}
@@ -145,7 +145,7 @@ export default function CreateTontinePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1.5">Description</label>
+                <label className="form-label">Description</label>
                 <textarea
                   {...register("description")}
                   rows={3}
@@ -156,8 +156,8 @@ export default function CreateTontinePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1.5">
-                  Montant de cotisation (XOF) <span className="text-red-500">*</span>
+                <label className="form-label">
+                  Montant de cotisation (XOF) <span className="text-danger">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -177,7 +177,7 @@ export default function CreateTontinePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Fréquence</label>
+                  <label className="form-label">Fréquence</label>
                   <select {...register("frequency")} className="input-field">
                     <option value="WEEKLY">Hebdomadaire</option>
                     <option value="BIWEEKLY">Bimensuelle</option>
@@ -186,8 +186,8 @@ export default function CreateTontinePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">
-                    Nombre de membres <span className="text-red-500">*</span>
+                  <label className="form-label">
+                    Nombre de membres <span className="text-danger">*</span>
                   </label>
                   <input
                     {...register("maxMembers", { valueAsNumber: true })}
@@ -202,9 +202,9 @@ export default function CreateTontinePage() {
 
               {/* Preview */}
               {values.amount && values.maxMembers && (
-                <div className="bg-green-50 rounded-lg p-4 text-sm">
-                  <p className="font-semibold text-green-800 mb-2">💡 Aperçu de votre tontine</p>
-                  <div className="space-y-1 text-green-700">
+                <div className="bg-brand-soft rounded-lg p-4 text-sm">
+                  <p className="font-semibold text-brand-deep mb-2">Aperçu de votre tontine</p>
+                  <div className="space-y-1 text-brand-deep">
                     <p>Cagnotte totale par cycle : <strong>{formatCurrency(values.amount * (values.maxMembers || 0))}</strong></p>
                     <p>Durée totale : <strong>{values.maxMembers} {FREQUENCY_LABELS[values.frequency] === "Mensuelle" ? "mois" : "cycles"}</strong></p>
                     <p>Commission plateforme (1%) : <strong>{formatCurrency(values.amount * (values.maxMembers || 0) * 0.01)}</strong></p>
@@ -220,7 +220,7 @@ export default function CreateTontinePage() {
               <h3 className="font-semibold text-lg">Règles & Pénalités</h3>
 
               <div>
-                <label className="block text-sm font-medium mb-1.5">Mode de rotation</label>
+                <label className="form-label">Mode de rotation</label>
                 <select {...register("rotationMode")} className="input-field">
                   <option value="MANUAL">Manuel (admin choisit l&apos;ordre)</option>
                   <option value="RANDOM">Aléatoire (tirage au sort)</option>
@@ -230,7 +230,7 @@ export default function CreateTontinePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Pénalité de retard</label>
+                  <label className="form-label">Pénalité de retard</label>
                   <div className="relative">
                     <input
                       {...register("latePenaltyAmount", { valueAsNumber: true })}
@@ -245,7 +245,7 @@ export default function CreateTontinePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1.5">Type de pénalité</label>
+                  <label className="form-label">Type de pénalité</label>
                   <select {...register("latePenaltyType")} className="input-field">
                     <option value="FIXED">Montant fixe</option>
                     <option value="PERCENTAGE">Pourcentage</option>
@@ -254,7 +254,7 @@ export default function CreateTontinePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1.5">
+                <label className="form-label">
                   Retards max avant exclusion
                 </label>
                 <input
@@ -309,8 +309,8 @@ export default function CreateTontinePage() {
                 <SummaryRow label="Tontine privée" value={values.isPrivate ? "Oui" : "Non"} />
               </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3">
-                <Info size={18} className="text-amber-600 shrink-0 mt-0.5" />
+              <div className="alert-info flex gap-3">
+                <Info size={18} className="text-warning shrink-0 mt-0.5" />
                 <p className="text-sm text-amber-700">
                   Une fois la tontine démarrée, le montant, la fréquence et le nombre de membres
                   ne peuvent plus être modifiés.
@@ -318,7 +318,7 @@ export default function CreateTontinePage() {
               </div>
 
               {serverError && (
-                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+                <div className="alert-error">
                   {serverError}
                 </div>
               )}
@@ -332,7 +332,7 @@ export default function CreateTontinePage() {
             type="button"
             onClick={() => setStep((s) => Math.max(s - 1, 1))}
             disabled={step === 1}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-(--border) text-sm font-medium hover:bg-(--muted) disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="btn-secondary"
           >
             <ArrowLeft size={16} />
             Précédent
@@ -342,7 +342,7 @@ export default function CreateTontinePage() {
             <button
               type="button"
               onClick={nextStep}
-              className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 transition"
+              className="btn-primary"
             >
               Suivant
               <ArrowRight size={16} />
@@ -351,7 +351,7 @@ export default function CreateTontinePage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 bg-green-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-60 transition"
+              className="btn-primary"
             >
               {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
               {isSubmitting ? "Création..." : "Créer la tontine"}
@@ -366,7 +366,7 @@ export default function CreateTontinePage() {
 // ─── Helper Components ─────────────────────────────────────────────────────────
 
 function Error({ children }: { children: React.ReactNode }) {
-  return <p className="mt-1 text-sm text-red-500">{children}</p>;
+  return <p className="form-error">{children}</p>;
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
@@ -387,7 +387,7 @@ const ToggleField = ({
   <label className="flex items-start gap-3 cursor-pointer group">
     <div className="relative mt-0.5">
       <input type="checkbox" className="sr-only peer" {...props} />
-      <div className="w-10 h-6 bg-(--muted) peer-checked:bg-green-500 rounded-full transition-colors" />
+      <div className="w-10 h-6 bg-(--border) peer-checked:bg-brand rounded-full transition-colors" />
       <div className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4 shadow" />
     </div>
     <div>

@@ -85,10 +85,10 @@ export function CyclesTab({ cycles, members, tontineId, isAdmin }: CyclesTabProp
                 <div className="flex items-center gap-3">
                   {cycle.status === "ACTIVE" && (
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-green-600">{progress}%</p>
+                      <p className="text-sm font-semibold text-brand">{progress}%</p>
                       <div className="w-16 h-1 bg-(--muted) rounded-full mt-1">
                         <div
-                          className="h-full bg-green-500 rounded-full"
+                          className="h-full bg-brand rounded-full"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -108,7 +108,7 @@ export function CyclesTab({ cycles, members, tontineId, isAdmin }: CyclesTabProp
                     </div>
                     <div>
                       <p className="text-(--muted-foreground) text-xs">Collecté</p>
-                      <p className="font-semibold text-green-600">
+                      <p className="font-semibold text-brand">
                         {formatCurrency(cycle.collectedAmount)}
                       </p>
                     </div>
@@ -155,19 +155,19 @@ function CycleStatusIcon({ status }: { status: string }) {
   switch (status) {
     case "ACTIVE":
       return (
-        <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-brand-soft text-brand flex items-center justify-center">
           <Clock size={14} />
         </div>
       );
     case "COMPLETED":
       return (
-        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-info-soft text-info flex items-center justify-center">
           <CheckCircle2 size={14} />
         </div>
       );
     case "FAILED":
       return (
-        <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-danger-soft text-danger flex items-center justify-center">
           <AlertTriangle size={14} />
         </div>
       );
@@ -182,10 +182,10 @@ function CycleStatusIcon({ status }: { status: string }) {
 
 function ContribBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    PAID: "bg-green-100 text-green-700",
-    PENDING: "bg-amber-100 text-amber-700",
-    LATE: "bg-red-100 text-red-700",
-    EXCUSED: "bg-blue-100 text-blue-700",
+    PAID: "badge-green",
+    PENDING: "badge-amber",
+    LATE: "badge-red",
+    EXCUSED: "badge-blue",
   };
   const labels: Record<string, string> = {
     PAID: "Payé",
@@ -194,7 +194,7 @@ function ContribBadge({ status }: { status: string }) {
     EXCUSED: "Excusé",
   };
   return (
-    <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${styles[status] ?? ""}`}>
+    <span className={`badge ${styles[status] ?? "badge-gray"}`}>
       {labels[status] ?? status}
     </span>
   );

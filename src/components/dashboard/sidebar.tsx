@@ -11,7 +11,6 @@ import {
   Settings,
   LogOut,
   PlusCircle,
-  HandshakeIcon,
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
 import type { Session } from "next-auth";
@@ -32,19 +31,21 @@ export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 bg-(--card) border-r border-(--border) h-full">
+    <aside className="hidden h-full w-64 flex-col border-r border-(--border) bg-white lg:flex">
       {/* Logo */}
-      <div className="p-6 border-b border-(--border)">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-green-600 flex items-center justify-center text-white text-lg">
-            🤝
-          </div>
-          <span className="font-bold text-lg">TontinePay</span>
+      <div className="border-b border-(--border) p-5">
+        <Link href="/dashboard" className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand font-display text-sm font-bold text-white">
+            TP
+          </span>
+          <span className="font-display text-lg font-bold tracking-tight">
+            Tontine<span className="text-brand">Pay</span>
+          </span>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 space-y-1 overflow-y-auto p-4">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + "/");
           return (
@@ -52,13 +53,13 @@ export function Sidebar({ user }: SidebarProps) {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400"
+                  ? "bg-brand-soft font-semibold text-brand-deep"
                   : "text-(--muted-foreground) hover:bg-(--muted) hover:text-(--foreground)"
               )}
             >
-              <Icon size={18} />
+              <Icon size={18} className={isActive ? "text-brand" : undefined} />
               {label}
             </Link>
           );
@@ -66,33 +67,35 @@ export function Sidebar({ user }: SidebarProps) {
 
         {/* CTA Créer */}
         <div className="pt-4">
-          <Link
-            href="/tontines/new"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
-          >
+          <Link href="/tontines/new" className="btn-primary w-full">
             <PlusCircle size={18} />
             Créer une tontine
           </Link>
         </div>
       </nav>
 
-      {/* User section */}
-      <div className="p-4 border-t border-(--border)">
+      {/* Section utilisateur */}
+      <div className="border-t border-(--border) p-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-semibold text-sm shrink-0">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-soft font-semibold text-sm text-brand-deep">
             {user?.image ? (
-              <img src={user.image} alt="" className="w-full h-full rounded-full object-cover" />
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.image}
+                alt=""
+                className="h-full w-full rounded-full object-cover"
+              />
             ) : (
               getInitials(user?.name ?? user?.email ?? "U")
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold truncate">{user?.name}</p>
-            <p className="text-xs text-(--muted-foreground) truncate">{user?.email}</p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold">{user?.name}</p>
+            <p className="truncate text-xs text-(--muted-foreground)">{user?.email}</p>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="text-(--muted-foreground) hover:text-red-500 transition-colors p-1"
+            className="p-1 text-(--muted-foreground) transition-colors hover:text-red-500"
             title="Déconnexion"
           >
             <LogOut size={16} />

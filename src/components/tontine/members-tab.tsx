@@ -58,7 +58,7 @@ export function MembersTab({
             <div
               key={member.id}
               className={`flex items-center justify-between p-4 ${
-                isCurrentUser ? "bg-green-50/50" : ""
+                isCurrentUser ? "bg-brand-soft/50" : ""
               }`}
             >
               <div className="flex items-center gap-3">
@@ -68,7 +68,7 @@ export function MembersTab({
                 </div>
 
                 {/* Avatar */}
-                <div className="w-8 h-8 rounded-full bg-green-100 text-green-700 font-semibold text-sm flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-brand-soft text-brand-deep font-semibold text-sm flex items-center justify-center shrink-0">
                   {getInitials(member.user.name ?? member.user.email)}
                 </div>
 
@@ -78,22 +78,22 @@ export function MembersTab({
                     <p className="text-sm font-medium">
                       {member.user.name ?? member.user.email.split("@")[0]}
                       {isCurrentUser && (
-                        <span className="ml-1 text-xs text-green-600 font-normal">(vous)</span>
+                        <span className="ml-1 text-xs text-brand font-normal">(vous)</span>
                       )}
                     </p>
                     {member.role !== "MEMBER" && (
-                      <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">
+                      <span className="text-xs bg-brand-soft text-brand-deep px-1.5 py-0.5 rounded font-medium">
                         {member.role === "ADMIN" ? "Admin" : "Co-admin"}
                       </span>
                     )}
                     {member.hasReceivedPot && (
                       <span title="A reçu la cagnotte">
-                        <CheckCircle2 size={14} className="text-green-500" />
+                        <CheckCircle2 size={14} className="text-brand" />
                       </span>
                     )}
                   </div>
                   {member.latePayments > 0 && (
-                    <p className="text-xs text-amber-600 flex items-center gap-1">
+                    <p className="text-xs text-warning flex items-center gap-1">
                       <AlertTriangle size={11} />
                       {member.latePayments} retard(s)
                     </p>
@@ -123,25 +123,25 @@ function ContributionIcon({ status }: { status?: string }) {
     case "PAID":
       return (
         <span title="Payé">
-          <CheckCircle2 size={18} className="text-green-500" />
+          <CheckCircle2 size={18} className="text-brand" />
         </span>
       );
     case "LATE":
       return (
         <span title="En retard">
-          <AlertTriangle size={18} className="text-amber-500" />
+          <AlertTriangle size={18} className="text-warning" />
         </span>
       );
     case "EXCUSED":
       return (
         <span title="Excusé">
-          <XCircle size={18} className="text-blue-400" />
+          <XCircle size={18} className="text-info" />
         </span>
       );
     case "CANCELLED":
       return (
         <span title="Annulé">
-          <XCircle size={18} className="text-red-400" />
+          <XCircle size={18} className="text-danger" />
         </span>
       );
     default:

@@ -19,23 +19,23 @@ import { BackButton, MarkAllReadButton } from "./notification-actions";
 function NotificationIcon({ type }: { type: NotificationType }) {
   switch (type) {
     case "CONTRIBUTION_PAID":
-      return <CheckCircle2 size={20} className="text-green-600" />;
+      return <CheckCircle2 size={20} className="text-brand" />;
     case "CONTRIBUTION_DUE":
     case "CONTRIBUTION_LATE":
     case "PENALTY_APPLIED":
-      return <AlertCircle size={20} className="text-red-600" />;
+      return <AlertCircle size={20} className="text-danger" />;
     case "POT_RECEIVED":
-      return <Gift size={20} className="text-amber-600" />;
+      return <Gift size={20} className="text-warning" />;
     case "MEMBER_JOINED":
     case "MEMBER_LEFT":
-      return <Users size={20} className="text-blue-600" />;
+      return <Users size={20} className="text-info" />;
     case "TONTINE_STARTED":
     case "CYCLE_STARTED":
     case "CYCLE_COMPLETED":
     case "TONTINE_COMPLETED":
       return <Rocket size={20} className="text-purple-600" />;
     case "ANNOUNCEMENT":
-      return <Megaphone size={20} className="text-blue-600" />;
+      return <Megaphone size={20} className="text-info" />;
     default:
       return <Bell size={20} className="text-(--muted-foreground)" />;
   }
@@ -61,11 +61,11 @@ export default async function NotificationsPage() {
       {/* En-tête */}
       <div className="flex items-center justify-between gap-3 mb-6">
         <BackButton />
-        <h1 className="text-2xl font-bold">Notifications</h1>
+        <h1 className="page-title">Notifications</h1>
         <div className="min-w-24 text-right">
           {unreadCount > 0 && (
-            <span className="inline-flex items-center gap-2 text-sm font-medium text-green-600">
-              <span className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-brand">
+              <span className="w-6 h-6 rounded-full bg-brand flex items-center justify-center text-white text-xs font-bold">
                 {unreadCount > 99 ? "99+" : unreadCount}
               </span>
               {unreadCount > 1 ? "nouvelles" : "nouvelle"}
@@ -81,7 +81,7 @@ export default async function NotificationsPage() {
       >
         <Settings size={18} className="text-(--muted-foreground)" />
         <span className="text-sm">
-          Gérez vos alertes email et SMS dans les <span className="font-medium text-green-600">paramètres</span>
+          Gérez vos alertes email et SMS dans les <span className="font-medium text-brand">paramètres</span>
         </span>
       </Link>
 
@@ -98,7 +98,7 @@ export default async function NotificationsPage() {
               <div
                 key={n.id}
                 className={`flex items-start gap-4 p-5 transition hover:bg-(--muted) ${
-                  n.isRead ? "" : "bg-green-500/10"
+                  n.isRead ? "" : "bg-brand-soft/60"
                 }`}
               >
                 <div className="shrink-0 mt-1">
@@ -116,7 +116,7 @@ export default async function NotificationsPage() {
                   <p className="text-sm text-(--muted-foreground)">{n.message}</p>
                 </div>
                 {!n.isRead && (
-                  <span className="mt-2 w-2 h-2 rounded-full bg-green-500 shrink-0" aria-label="Non lue" />
+                  <span className="mt-2 w-2 h-2 rounded-full bg-brand shrink-0" aria-label="Non lue" />
                 )}
               </div>
             ))}

@@ -94,10 +94,10 @@ export default async function WalletPage() {
     <div className="space-y-6 max-w-6xl w-full min-w-0">
       {/* En-tête */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl sm:text-3xl font-bold">Mon Portefeuille</h1>
+        <h1 className="page-title">Mon Portefeuille</h1>
         <Link
           href="/tontines/new"
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition"
+          className="btn-primary"
         >
           <Plus size={16} />
           Nouvelle tontine
@@ -108,32 +108,32 @@ export default async function WalletPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <SummaryCard
           icon={Wallet}
-          iconClass="text-green-600"
-          valueClass="text-green-600"
+          iconClass="text-brand"
+          valueClass="text-brand"
           title="Total épargné"
           value={formatCurrency(totalSaved)}
           description="Épargne accumulée dans vos tontines"
         />
         <SummaryCard
           icon={TrendingUp}
-          iconClass="text-amber-600"
-          valueClass="text-amber-600"
+          iconClass="text-warning"
+          valueClass="text-warning"
           title="À recevoir"
           value={formatCurrency(totalToReceive)}
           description="Attendu lors de vos prochains tours"
         />
         <SummaryCard
           icon={AlertCircle}
-          iconClass="text-red-600"
-          valueClass="text-red-600"
+          iconClass="text-danger"
+          valueClass="text-danger"
           title="Cotisations en attente"
           value={String(pendingCount)}
           description="À payer pour éviter les pénalités"
         />
         <SummaryCard
           icon={ArrowRight}
-          iconClass="text-blue-600"
-          valueClass="text-blue-600"
+          iconClass="text-info"
+          valueClass="text-info"
           title="Score fiabilité"
           value={`${reliability}%`}
           description="Votre ponctualité dans les paiements"
@@ -164,7 +164,7 @@ export default async function WalletPage() {
                   </div>
                   <span
                     className={`shrink-0 text-sm sm:text-base font-semibold whitespace-nowrap ${
-                      isCredit ? "text-green-600" : "text-red-600"
+                      isCredit ? "text-success" : "text-danger"
                     }`}
                   >
                     {isCredit ? "+" : "-"}
@@ -185,7 +185,7 @@ export default async function WalletPage() {
             href="/tontines/new"
             className="bg-(--card) rounded-xl border border-(--border) p-4 sm:p-6 text-center flex flex-col items-center justify-center hover:bg-(--muted) transition"
           >
-            <Plus size={24} className="mb-3 text-green-600" />
+            <Plus size={24} className="mb-3 text-brand" />
             <h3 className="font-semibold mb-1">Créer une tontine</h3>
             <p className="text-(--muted-foreground) text-sm">
               Démarrez votre propre groupe d&apos;épargne
@@ -196,7 +196,7 @@ export default async function WalletPage() {
             href="/tontines/join"
             className="bg-(--card) rounded-xl border border-(--border) p-4 sm:p-6 text-center flex flex-col items-center justify-center hover:bg-(--muted) transition"
           >
-            <MapPin size={24} className="mb-3 text-blue-600" />
+            <MapPin size={24} className="mb-3 text-info" />
             <h3 className="font-semibold mb-1">Rejoindre une tontine</h3>
             <p className="text-(--muted-foreground) text-sm">
               Participez à un groupe avec un code d&apos;invitation
